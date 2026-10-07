@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getDashboardData } from '../api/dashboardApi';
 import type { DashboardData } from '../types';
 
@@ -6,23 +6,28 @@ interface UseDashboardDataResult {
   data: DashboardData | null;
   isLoading: boolean;
   error: Error | null;
+  /** Refetches in the background; the current data stays on screen until the new data arrives. */
+  reload: () => void;
 }
 
-/**
- * Loads dashboard data through the same async shape a real API-backed hook
- * will use later (`{ data, isLoading, error }`), even though today's source
- * is mock data resolved instantly. Components should depend on this hook,
- * not on `mockData.ts` or `dashboardApi.ts` directly.
- */
-export function useDashboardData(): UseDashboardDataResult {
+/** Loads the dashboard for `weddingId`; stays in the loading state until an id is available. */
+export function useDashboardData(weddingId: string | null): UseDashboardDataResult {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
+
+  const reload = useCallback(() => setReloadCount((count) => count + 1), []);
 
   useEffect(() => {
-    let isMounted = true;
+    if (!weddingId) {
+      return;
+    }
 
-    getDashboardData()
+    let isMounted = true;
+    setError(null);
+
+    getDashboardData(weddingId)
       .then((result) => {
         if (isMounted) {
           setData(result);
@@ -39,7 +44,7 @@ export function useDashboardData(): UseDashboardDataResult {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [weddingId, reloadCount]);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, reload };
 }

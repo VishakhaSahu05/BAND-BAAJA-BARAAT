@@ -5,9 +5,10 @@ import type { CountdownSummary, WeddingSummary } from '../types';
 interface HeroSectionProps {
   wedding: WeddingSummary;
   countdown: CountdownSummary;
+  onEdit: () => void;
 }
 
-export function HeroSection({ wedding, countdown }: HeroSectionProps) {
+export function HeroSection({ wedding, countdown, onEdit }: HeroSectionProps) {
   return (
     <section className="relative w-full overflow-hidden bg-surface-container-low pt-8 px-gutter-mobile md:px-page-margin pb-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <div className="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-primary-soft blur-3xl pointer-events-none" />
@@ -15,9 +16,19 @@ export function HeroSection({ wedding, countdown }: HeroSectionProps) {
       <div className="max-w-7xl mx-auto w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <div className="flex flex-col justify-center gap-4 py-2 lg:col-span-7">
-            <div className="text-label-sm inline-flex items-center gap-1 bg-primary-soft text-primary py-1 px-4 rounded-full uppercase tracking-[0.08em] font-bold w-fit">
-              <Icon name="stars" />
-              <span>{wedding.eventLabel}</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="text-label-sm inline-flex items-center gap-1 bg-primary-soft text-primary py-1 px-4 rounded-full uppercase tracking-[0.08em] font-bold w-fit">
+                <Icon name="stars" />
+                <span>{wedding.eventLabel}</span>
+              </div>
+              <button
+                type="button"
+                onClick={onEdit}
+                className="text-label-md inline-flex items-center gap-1 py-1 px-3 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface font-semibold transition-colors duration-150 hover:border-primary hover:text-primary"
+              >
+                <Icon name="edit" style={{ fontSize: 16 }} />
+                Edit details
+              </button>
             </div>
             <div>
               <h1 className="text-display-md text-on-surface font-bold leading-[1.15]">

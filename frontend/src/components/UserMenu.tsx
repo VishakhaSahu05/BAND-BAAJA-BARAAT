@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../features/auth/AuthContext';
+import { ApiClientError } from '../services/apiClient';
 import { Icon } from './Icon';
 import { LogoutConfirmModal } from './LogoutConfirmModal';
 
@@ -9,14 +12,31 @@ interface UserMenuProps {
   avatarAlt: string;
 }
 
-/**
- * Header profile dropdown + logout confirmation. Local UI state only (open/closed) —
- * "Log Out" does not call any API in this step; identity data is passed in as props.
- */
+/** Header profile dropdown + logout confirmation, backed by the real session. */
 export function UserMenu({ coupleName, roleLabel, avatarSrc, avatarAlt }: UserMenuProps) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  async function handleConfirmLogout() {
+    setIsLoggingOut(true);
+    setLogoutError(null);
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+      setIsLogoutModalOpen(false);
+    } catch (error) {
+      setLogoutError(
+        error instanceof ApiClientError ? error.displayMessage : 'Could not log out. Please try again.',
+      );
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
@@ -93,8 +113,15 @@ export function UserMenu({ coupleName, roleLabel, avatarSrc, avatarAlt }: UserMe
 
       {isLogoutModalOpen && (
         <LogoutConfirmModal
-          onCancel={() => setIsLogoutModalOpen(false)}
-          onConfirm={() => setIsLogoutModalOpen(false)}
+          onCancel={() => {
+            setIsLogoutModalOpen(false);
+            setLogoutError(null);
+          }}
+          onConfirm={() => {
+            void handleConfirmLogout();
+          }}
+          isConfirming={isLoggingOut}
+          errorMessage={logoutError}
         />
       )}
     </div>

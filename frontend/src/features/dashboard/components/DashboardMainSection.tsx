@@ -7,15 +7,28 @@ interface DashboardMainSectionProps {
   criticalTasks: CriticalTaskEntry[];
   familyCircle: FamilyMemberEntry[];
   venue: VenueSummary;
+  onAddCeremony: () => void;
+  onEditCeremony: (ceremonyId: string) => void;
 }
 
 /** The two-column body: ceremonies/itinerary (7 cols) and coordination/concierge (5 cols). */
-export function DashboardMainSection({ ceremonies, criticalTasks, familyCircle, venue }: DashboardMainSectionProps) {
+export function DashboardMainSection({
+  ceremonies,
+  criticalTasks,
+  familyCircle,
+  venue,
+  onAddCeremony,
+  onEditCeremony,
+}: DashboardMainSectionProps) {
   return (
     <section className="max-w-7xl mx-auto w-full px-gutter-mobile md:px-page-margin pb-10">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         <div className="min-w-0 lg:col-span-7">
-          <CeremonyItinerarySection ceremonies={ceremonies} />
+          <CeremonyItinerarySection
+            ceremonies={ceremonies}
+            onAddCeremony={onAddCeremony}
+            onEditCeremony={onEditCeremony}
+          />
         </div>
         <div className="min-w-0 lg:col-span-5">
           <CoordinationColumn tasks={criticalTasks} familyCircle={familyCircle} venue={venue} />

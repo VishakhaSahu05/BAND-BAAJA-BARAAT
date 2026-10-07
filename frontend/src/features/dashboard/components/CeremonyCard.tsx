@@ -25,9 +25,10 @@ const accentSoft: Record<MetricAccent, string> = {
 
 interface CeremonyCardProps {
   ceremony: CeremonyItineraryEntry;
+  onEdit: () => void;
 }
 
-export function CeremonyCard({ ceremony }: CeremonyCardProps) {
+export function CeremonyCard({ ceremony, onEdit }: CeremonyCardProps) {
   const color = accentColor[ceremony.accent];
 
   return (
@@ -73,15 +74,20 @@ export function CeremonyCard({ ceremony }: CeremonyCardProps) {
           <p className="text-body-sm text-on-surface-variant mt-1">{ceremony.description}</p>
         </div>
         <div className="pt-1 flex items-center justify-between">
-          <span className="text-label-sm bg-surface-container-high text-on-surface-variant py-0.5 px-2 rounded">
-            {ceremony.dressCode}
-          </span>
+          {ceremony.dressCode ? (
+            <span className="text-label-sm bg-surface-container-high text-on-surface-variant py-0.5 px-2 rounded">
+              {ceremony.dressCode}
+            </span>
+          ) : null}
           <button
             type="button"
-            className="text-label-sm font-semibold bg-none border-none p-0 hover:underline"
+            onClick={onEdit}
+            aria-label={`Edit ${ceremony.name}`}
+            className="text-label-sm font-semibold bg-none border-none p-0 ml-auto inline-flex items-center gap-1 hover:underline"
             style={{ color }}
           >
-            View Details →
+            <Icon name="edit" style={{ fontSize: 14 }} />
+            Edit Details
           </button>
         </div>
       </div>

@@ -1,13 +1,14 @@
-import { mockDashboardData } from '../mockData';
-import type { DashboardData } from '../types';
+import { apiRequest } from '../../../services/apiClient';
+import type { DashboardData, ShlokaQuote } from '../types';
 
-/**
- * Stand-in for a future call to `GET /weddings/:weddingId/dashboard`
- * (REST API Design doc §17). No network/backend code runs in this step —
- * this resolves with isolated mock data so the rest of the feature can be
- * written against a `Promise<DashboardData>` contract and swapped over
- * later without touching any component.
- */
-export function getDashboardData(): Promise<DashboardData> {
-  return Promise.resolve(mockDashboardData);
+const DASHBOARD_QUOTE: ShlokaQuote = {
+  text: '"माङ्गल्यं तन्तुनानेन मम जीवनहेतुना । कण्ठे बध्नामि सुभगे सञ्जीव शरदः शतम् ॥"',
+  attribution: 'Shubh Vivaah',
+};
+
+export async function getDashboardData(weddingId: string): Promise<DashboardData> {
+  const response = await apiRequest<Omit<DashboardData, 'quote'>>(
+    `/weddings/${encodeURIComponent(weddingId)}/dashboard`,
+  );
+  return { ...response, quote: DASHBOARD_QUOTE };
 }

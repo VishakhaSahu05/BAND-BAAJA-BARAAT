@@ -7,7 +7,7 @@ function pad(value: number): string {
 
 export interface CountdownTimerProps {
   targetDate: Date;
-  muhuratTimeLabel: string;
+  muhuratTimeLabel?: string;
 }
 
 /**
@@ -47,7 +47,9 @@ export function CountdownTimer({ targetDate, muhuratTimeLabel }: CountdownTimerP
       <div className="mt-4 pt-1 flex items-center justify-between text-on-surface-variant">
         <div className="flex items-center gap-1">
           <Icon name="verified" className="text-secondary text-base" />
-          <span className="text-label-md text-on-surface">Vedic Lagna • {muhuratTimeLabel}</span>
+          <span className="text-label-md text-on-surface">
+            {muhuratTimeLabel ? `Vedic Lagna • ${muhuratTimeLabel}` : 'Muhurat not set yet'}
+          </span>
         </div>
         <span className="text-label-sm text-tertiary font-bold tracking-wide">Synchronized</span>
       </div>

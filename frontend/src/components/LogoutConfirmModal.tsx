@@ -1,16 +1,25 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon } from './Icon';
 
 interface LogoutConfirmModalProps {
   onCancel: () => void;
   onConfirm: () => void;
+  isConfirming?: boolean;
+  errorMessage?: string | null;
 }
 
 /**
- * Presentational confirmation dialog. `onConfirm` is a no-op hook for the
- * caller — this step does not implement an actual logout/auth request.
+ * Rendered via a portal to document.body so its `fixed inset-0` backdrop covers
+ * the full viewport — AppHeader's `backdrop-blur` creates a containing block for
+ * `position: fixed` descendants, which would otherwise clip this to the header.
  */
-export function LogoutConfirmModal({ onCancel, onConfirm }: LogoutConfirmModalProps) {
+export function LogoutConfirmModal({
+  onCancel,
+  onConfirm,
+  isConfirming = false,
+  errorMessage = null,
+}: LogoutConfirmModalProps) {
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
@@ -21,7 +30,7 @@ export function LogoutConfirmModal({ onCancel, onConfirm }: LogoutConfirmModalPr
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onCancel]);
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 bg-[rgba(51,48,45,0.4)] backdrop-blur-sm flex items-center justify-center p-gutter-mobile"
       onClick={onCancel}
@@ -46,24 +55,32 @@ export function LogoutConfirmModal({ onCancel, onConfirm }: LogoutConfirmModalPr
             <p className="text-body-md text-on-surface-variant mt-1">Are you sure you want to log out?</p>
           </div>
         </div>
+        {errorMessage ? (
+          <p role="alert" className="text-body-sm text-on-error-container bg-error-container rounded-lg px-3 py-2 mt-4">
+            {errorMessage}
+          </p>
+        ) : null}
         <div className="mt-6 flex items-center justify-end gap-2 pt-1">
           <button
             type="button"
-            className="text-label-md py-1.5 px-4 rounded-lg border border-outline-variant bg-transparent text-on-surface font-semibold transition-colors duration-150 hover:bg-surface-container"
+            disabled={isConfirming}
+            className="text-label-md py-1.5 px-4 rounded-lg border border-outline-variant bg-transparent text-on-surface font-semibold transition-colors duration-150 hover:bg-surface-container disabled:opacity-60 disabled:pointer-events-none"
             onClick={onCancel}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="text-label-md inline-flex items-center gap-1 py-1.5 px-4 rounded-lg border-none bg-secondary text-on-secondary font-semibold shadow-[0_4px_14px_rgba(164,55,0,0.3)] transition-[background-color,transform] duration-150 hover:bg-secondary-container active:scale-95"
+            disabled={isConfirming}
+            className="text-label-md inline-flex items-center gap-1 py-1.5 px-4 rounded-lg border-none bg-secondary text-on-secondary font-semibold shadow-[0_4px_14px_rgba(164,55,0,0.3)] transition-[background-color,transform] duration-150 hover:bg-secondary-container active:scale-95 disabled:opacity-60 disabled:pointer-events-none"
             onClick={onConfirm}
           >
             <Icon name="check" />
-            <span>Log Out</span>
+            <span>{isConfirming ? 'Logging Out…' : 'Log Out'}</span>
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

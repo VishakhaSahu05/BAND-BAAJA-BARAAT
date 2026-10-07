@@ -17,14 +17,16 @@ export function VenueInfoCard({ venue }: VenueInfoCardProps) {
       <div className="mt-4 flex items-center justify-between pt-1">
         <div className="text-body-sm flex items-center gap-1 text-on-surface-variant">
           <Icon name="support_agent" className="text-primary text-base" />
-          <span>{venue.opsContactName}</span>
+          <span>{venue.opsContactName ?? 'Venue contact not added yet'}</span>
         </div>
-        <a
-          href={`tel:${venue.phoneNumber}`}
-          className="text-label-sm bg-tertiary text-on-tertiary py-1.5 px-4 rounded-lg font-semibold transition-colors duration-150 hover:bg-tertiary-container"
-        >
-          Call Concierge
-        </a>
+        {venue.phoneNumber ? (
+          <a
+            href={`tel:${venue.phoneNumber}`}
+            className="text-label-sm bg-tertiary text-on-tertiary py-1.5 px-4 rounded-lg font-semibold transition-colors duration-150 hover:bg-tertiary-container"
+          >
+            Call Concierge
+          </a>
+        ) : null}
       </div>
     </div>
   );
